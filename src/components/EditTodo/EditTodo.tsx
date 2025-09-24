@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
+import { putTodo } from '@/api/todos';
 
 interface EditTodoProps {
   initialValue: string;
@@ -18,6 +19,9 @@ const EditTodo: React.FC<EditTodoProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!text.trim()) return;
+
+    console.log('e', e);
+    // putTodo();
     onSave(text.trim());
   };
 

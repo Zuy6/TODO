@@ -6,14 +6,17 @@ import AddTodo from './components/AddTodo/AddTodo';
 import TodoList from './components/TodoList/TodoList';
 import { Todo } from './types/Todo';
 import { loadTodos, saveTodos } from './utils/localStorage';
+import { fetchTodos, putTodo } from './api/todos';
 
 const AppContent: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>(() => loadTodos());
+  const [todos1, setTodos1] = useState<Todo[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const { darkMode, toggleTheme } = React.useContext(ThemeContext);
 
   useEffect(() => {
     saveTodos(todos);
+    fetchTodos(1, 10).then((res) => setTodos1(res.data));
   }, [todos]);
 
   const addTodo = (todo: Todo) => {
@@ -31,7 +34,8 @@ const AppContent: React.FC = () => {
   };
 
   const editTodo = (id: number, text: string) => {
-    setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, text } : t)));
+    putTodo(text, id);
+    setTodos1((prev) => prev.map((t) => (t.id === id ? { ...t, text } : t)));
   };
 
   return (
@@ -50,7 +54,7 @@ const AppContent: React.FC = () => {
           <CardContent>
             <AddTodo addTodo={addTodo} />
             <TodoList
-              todos={todos}
+              todos={todos1}
               onToggle={toggleComplete}
               onDelete={deleteTodo}
               onEdit={editTodo}

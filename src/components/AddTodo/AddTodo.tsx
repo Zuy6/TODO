@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Input } from '../../components/ui/input';
 import { Button } from '../../components/ui/button';
+import { postTodo } from '@/api/todos';
 
 interface AddTodoProps {
   addTodo: (todo: Todo) => void;
@@ -23,6 +24,9 @@ const AddTodo: React.FC<AddTodoProps> = ({ addTodo }) => {
       completed: false,
       createdAt: new Date(),
     });
+
+    postTodo(text.trim());
+
     setText('');
   };
 
