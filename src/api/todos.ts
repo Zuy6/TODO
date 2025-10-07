@@ -34,3 +34,8 @@ export const patchTodo = async (id: number) => {
 
   return response.data;
 };
+
+export const getTodosCount = async () => {
+  const response = await axios.get(`${API_URL}/todosCount`);
+  return response;
+};

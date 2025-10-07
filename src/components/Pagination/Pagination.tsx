@@ -1,86 +1,60 @@
-import React from 'react';
+import { useEffect } from 'react';
+import { Button } from '../ui/button';
 import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationPrevious,
-  PaginationNext,
-  PaginationEllipsis,
-} from '../../components/ui/pagination';
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '../ui/select';
 
-interface Props {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
+export type LimitType = '5' | '10' | '20';
+
+interface TodoPaginationProps {
+  count: number;
+  limit: LimitType;
+  setLimit: (limit: LimitType) => void;
+  page: number;
+  setPage: (page: number) => void;
+  todos: Todo[];
 }
-
-const MAX_VISIBLE_PAGES = 5;
-
-const PaginationComponent: React.FC<Props> = ({
-  currentPage,
-  totalPages,
-  onPageChange,
+export const Pagination: React.FC<TodoPaginationProps> = ({
+  count,
+  limit,
+  setLimit,
+  page,
+  setPage,
+  todos,
 }) => {
-  const pages = getPages(currentPage, totalPages);
+  const pageCount = Math.ceil(count / Number(limit));
+  const pages = [];
+  for (let i = 1; i <= pageCount; i++) {
+    pages.push(i);
+  }
+
+  
 
   return (
-    <Pagination>
-      <PaginationContent>
-        <PaginationItem>
-          <PaginationPrevious
-            onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-            className={
-              currentPage === 1 ? 'pointer-events-none opacity-50' : ''
-            }
-          />
-        </PaginationItem>
-
-        {pages.map((page, index) =>
-          page === 'ellipsis' ? (
-            <PaginationItem key={`ellipsis-${index}`}>
-              <PaginationEllipsis />
-            </PaginationItem>
-          ) : (
-            <PaginationItem key={page}>
-              <PaginationLink
-                onClick={() => onPageChange(page)}
-                isActive={currentPage === page}
-              >
-                {page}
-              </PaginationLink>
-            </PaginationItem>
-          )
-        )}
-
-        <PaginationItem>
-          <PaginationNext
-            onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-            className={
-              currentPage === totalPages ? 'pointer-events-none opacity-50' : ''
-            }
-          />
-        </PaginationItem>
-      </PaginationContent>
-    </Pagination>
+    <div>
+      <Select value={limit} onValueChange={setLimit}>
+        <SelectTrigger>
+          <SelectValue placeholder="Кол-во на странице" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="5">5</SelectItem>
+          <SelectItem value="10">10</SelectItem>
+          <SelectItem value="20">20</SelectItem>
+        </SelectContent>
+      </Select>
+      {pages.map((el) => (
+        <Button
+          onClick={el === page ? undefined : () => setPage(el)}
+          key={el}
+          type="button"
+        >
+          <span style={{ color: el === page ? 'red' : 'green' }}>{el}</span>
+        </Button>
+      ))}
+    </div>
   );
 };
-
-// Логика отображения страниц (с многоточиями)
-function getPages(current: number, total: number): Array<number | 'ellipsis'> {
-  if (total <= MAX_VISIBLE_PAGES) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-
-  if (current <= 3) {
-    return [1, 2, 3, 4, 'ellipsis', total];
-  }
-
-  if (current >= total - 2) {
-    return [1, 'ellipsis', total - 3, total - 2, total - 1, total];
-  }
-
-  return [1, 'ellipsis', current - 1, current, current + 1, 'ellipsis', total];
-}
-
-export default PaginationComponent;

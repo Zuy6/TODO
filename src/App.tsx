@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ThemeProvider, ThemeContext } from './contexts/ThemeContext';
 import { Card, CardHeader, CardTitle, CardContent } from './components/ui/card';
 import { Switch } from './components/ui/switch';
@@ -11,26 +11,46 @@ import {
   postTodo,
   deleteTodo as apiDeleteTodo,
   putTodo,
+  getTodosCount,
 } from './api/todos';
+import { LimitType, Pagination } from './components/Pagination/Pagination';
 
 const AppContent: React.FC = () => {
   // const [todos, setTodos] = useState<Todo[]>(() => loadTodos());
+  const [count, setCount] = useState<number>(0);
   const [todos, setTodos] = useState<Todo[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const { darkMode, toggleTheme } = React.useContext(ThemeContext);
-
+  const [limit, setLimit] = useState<LimitType>('5');
+  const [page, setPage] = useState<number>(1);
   useEffect(() => {
     saveTodos(todos);
   }, [todos]);
 
   useEffect(() => {
-    fetchTodos(1, 10).then((res) => setTodos(res.data));
-  }, []);
+    console.log('count', count);
+  }, [count]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [limit]);
+
+  const refresh = useCallback(async () => {
+    const res = await fetchTodos(page, Number(limit));
+    setTodos(res.data);
+  }, [page, limit]);
+
+  useEffect(() => {
+    getTodosCount().then((res) => {
+      setCount(res.data);
+    });
+    refresh();
+  }, [page, limit, refresh]);
 
   const addTodo = async (todo: Todo) => {
     const responseTodo = await postTodo(todo.text);
     console.log(responseTodo);
-    setTodos((prev) => [responseTodo, ...prev]);
+    refresh();
   };
 
   const toggleComplete = (id: number) => {
@@ -43,19 +63,15 @@ const AppContent: React.FC = () => {
     const responseTodo = await apiDeleteTodo(id);
 
     if (responseTodo.status === 200) {
-      setTodos((prev) => prev.filter((t) => t.id !== id));
+      refresh();
     } else {
       console.error('id not found');
     }
   };
 
   const editTodo = async (id: number, text: string) => {
-    const response = await putTodo(text, id);
-    setTodos((prev) =>
-      prev.map((t) =>
-        t.id === response.id ? { ...t, text: response.text } : t
-      )
-    );
+    await putTodo(text, id);
+    refresh();
   };
 
   return (
@@ -80,6 +96,14 @@ const AppContent: React.FC = () => {
               onEdit={editTodo}
               sortBy={sortBy}
               setSortBy={setSortBy}
+            />
+            <Pagination
+              count={count}
+              limit={limit}
+              setLimit={setLimit}
+              page={page}
+              setPage={setPage}
+              todos={todos}
             />
           </CardContent>
         </Card>
