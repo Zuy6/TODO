@@ -5,10 +5,17 @@ import { Switch } from './components/ui/switch';
 import AddTodo from './components/AddTodo/AddTodo';
 import TodoList from './components/TodoList/TodoList';
 import { Todo } from './types/Todo';
-import { loadTodos, saveTodos } from './utils/localStorage';
+import { saveTodos } from './utils/localStorage';
+import {
+  fetchTodos,
+  postTodo,
+  deleteTodo as apiDeleteTodo,
+  putTodo,
+} from './api/todos';
 
 const AppContent: React.FC = () => {
-  const [todos, setTodos] = useState<Todo[]>(() => loadTodos());
+  // const [todos, setTodos] = useState<Todo[]>(() => loadTodos());
+  const [todos, setTodos] = useState<Todo[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const { darkMode, toggleTheme } = React.useContext(ThemeContext);
 
@@ -16,8 +23,14 @@ const AppContent: React.FC = () => {
     saveTodos(todos);
   }, [todos]);
 
-  const addTodo = (todo: Todo) => {
-    setTodos((prev) => [todo, ...prev]);
+  useEffect(() => {
+    fetchTodos(1, 10).then((res) => setTodos(res.data));
+  }, []);
+
+  const addTodo = async (todo: Todo) => {
+    const responseTodo = await postTodo(todo.text);
+    console.log(responseTodo);
+    setTodos((prev) => [responseTodo, ...prev]);
   };
 
   const toggleComplete = (id: number) => {
@@ -26,12 +39,23 @@ const AppContent: React.FC = () => {
     );
   };
 
-  const deleteTodo = (id: number) => {
-    setTodos((prev) => prev.filter((t) => t.id !== id));
+  const deleteTodo = async (id: number) => {
+    const responseTodo = await apiDeleteTodo(id);
+
+    if (responseTodo.status === 200) {
+      setTodos((prev) => prev.filter((t) => t.id !== id));
+    } else {
+      console.error('id not found');
+    }
   };
 
-  const editTodo = (id: number, text: string) => {
-    setTodos((prev) => prev.map((t) => (t.id === id ? { ...t, text } : t)));
+  const editTodo = async (id: number, text: string) => {
+    const response = await putTodo(text, id);
+    setTodos((prev) =>
+      prev.map((t) =>
+        t.id === response.id ? { ...t, text: response.text } : t
+      )
+    );
   };
 
   return (
