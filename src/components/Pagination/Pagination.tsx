@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 import { Button } from '../ui/button';
 import {
   Select,
@@ -26,13 +26,12 @@ export const Pagination: React.FC<TodoPaginationProps> = ({
   setPage,
   todos,
 }) => {
-  const pageCount = Math.ceil(count / Number(limit));
-  const pages = [];
-  for (let i = 1; i <= pageCount; i++) {
-    pages.push(i);
-  }
-
-  
+  const pages = useMemo(
+    () =>
+      Array.from({ length: Math.ceil(count / Number(limit)) }, (_, i) => i + 1),
+    [count, limit]
+  );
+  console.log(pages);
 
   return (
     <div>

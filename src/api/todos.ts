@@ -3,10 +3,11 @@ import axios from 'axios';
 const API_URL = 'http://localhost:3001';
 
 export const fetchTodos = async (page: number, limit: number) => {
-  const response = await axios.get(
+  const { data } = await axios.get(
     `${API_URL}/todos?page=${page}&limit=${limit}`
   );
-  return response.data;
+  console.log('data_api', data);
+  return data;
 };
 
 export const postTodo = async (todoText: string) => {
@@ -24,9 +25,12 @@ export const putTodo = async (todoText: string, id: number) => {
 };
 
 export const deleteTodo = async (id: number) => {
-  const response = await axios.delete(`${API_URL}/todos/${id}`);
-
-  return response.data;
+  try {
+    const response = await axios.delete(`${API_URL}/todos/${id}`);
+    return response;
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 export const patchTodo = async (id: number) => {

@@ -17,35 +17,19 @@ import { LimitType, Pagination } from './components/Pagination/Pagination';
 
 const AppContent: React.FC = () => {
   // const [todos, setTodos] = useState<Todo[]>(() => loadTodos());
-  const [count, setCount] = useState<number>(0);
+  const [count, setCount] = useState<number>(0); //Общее кол-во todos
   const [todos, setTodos] = useState<Todo[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const { darkMode, toggleTheme } = React.useContext(ThemeContext);
   const [limit, setLimit] = useState<LimitType>('5');
   const [page, setPage] = useState<number>(1);
-  useEffect(() => {
-    saveTodos(todos);
-  }, [todos]);
-
-  useEffect(() => {
-    console.log('count', count);
-  }, [count]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [limit]);
 
   const refresh = useCallback(async () => {
-    const res = await fetchTodos(page, Number(limit));
-    setTodos(res.data);
+    const { todos, totalCount } = await fetchTodos(page, Number(limit));
+    console.log('======', todos, totalCount);
+    setTodos(todos);
+    setCount(totalCount);
   }, [page, limit]);
-
-  useEffect(() => {
-    getTodosCount().then((res) => {
-      setCount(res.data);
-    });
-    refresh();
-  }, [page, limit, refresh]);
 
   const addTodo = async (todo: Todo) => {
     const responseTodo = await postTodo(todo.text);
@@ -60,19 +44,30 @@ const AppContent: React.FC = () => {
   };
 
   const deleteTodo = async (id: number) => {
-    const responseTodo = await apiDeleteTodo(id);
-
-    if (responseTodo.status === 200) {
-      refresh();
-    } else {
-      console.error('id not found');
-    }
+    await apiDeleteTodo(id);
+    refresh();
   };
 
   const editTodo = async (id: number, text: string) => {
     await putTodo(text, id);
     refresh();
   };
+
+  useEffect(() => {
+    saveTodos(todos);
+  }, [todos]);
+
+  useEffect(() => {
+    console.log('count', count);
+  }, [count]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [limit]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
