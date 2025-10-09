@@ -11,7 +11,7 @@ import {
   postTodo,
   deleteTodo as apiDeleteTodo,
   putTodo,
-  getTodosCount,
+  patchTodo,
 } from './api/todos';
 import { LimitType, Pagination } from './components/Pagination/Pagination';
 
@@ -26,21 +26,18 @@ const AppContent: React.FC = () => {
 
   const refresh = useCallback(async () => {
     const { todos, totalCount } = await fetchTodos(page, Number(limit));
-    console.log('======', todos, totalCount);
     setTodos(todos);
     setCount(totalCount);
   }, [page, limit]);
 
   const addTodo = async (todo: Todo) => {
-    const responseTodo = await postTodo(todo.text);
-    console.log(responseTodo);
+    await postTodo(todo.text);
     refresh();
   };
 
-  const toggleComplete = (id: number) => {
-    setTodos((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, completed: !t.completed } : t))
-    );
+  const toggleComplete = async (id: number) => {
+    await patchTodo(id);
+    refresh();
   };
 
   const deleteTodo = async (id: number) => {
@@ -57,9 +54,7 @@ const AppContent: React.FC = () => {
     saveTodos(todos);
   }, [todos]);
 
-  useEffect(() => {
-    console.log('count', count);
-  }, [count]);
+  useEffect(() => {}, [count]);
 
   useEffect(() => {
     setPage(1);

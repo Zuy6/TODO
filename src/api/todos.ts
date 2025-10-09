@@ -6,7 +6,6 @@ export const fetchTodos = async (page: number, limit: number) => {
   const { data } = await axios.get(
     `${API_URL}/todos?page=${page}&limit=${limit}`
   );
-  console.log('data_api', data);
   return data;
 };
 
@@ -38,6 +37,8 @@ export const patchTodo = async (id: number) => {
 
   return response.data;
 };
+
+
 
 export const getTodosCount = async () => {
   const response = await axios.get(`${API_URL}/todosCount`);

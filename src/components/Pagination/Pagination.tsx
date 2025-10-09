@@ -31,7 +31,6 @@ export const Pagination: React.FC<TodoPaginationProps> = ({
       Array.from({ length: Math.ceil(count / Number(limit)) }, (_, i) => i + 1),
     [count, limit]
   );
-  console.log(pages);
 
   return (
     <div>
