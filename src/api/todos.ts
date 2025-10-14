@@ -1,9 +1,21 @@
+import { Todo } from '@/types/Todo';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:3001';
 
-export const fetchTodos = async (page: number, limit: number) => {
-  const { data } = await axios.get(
+export type FetchTodosResponse = {
+  todos: Todo[];
+  totalCount: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+};
+
+export const fetchTodos = async (
+  page: number,
+  limit: number
+): Promise<FetchTodosResponse> => {
+  const { data } = await axios.get<FetchTodosResponse>(
     `${API_URL}/todos?page=${page}&limit=${limit}`
   );
   return data;
@@ -38,9 +50,8 @@ export const patchTodo = async (id: number) => {
   return response.data;
 };
 
-
-
 export const getTodosCount = async () => {
   const response = await axios.get(`${API_URL}/todosCount`);
   return response;
 };
+

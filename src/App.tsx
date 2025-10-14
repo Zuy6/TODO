@@ -7,28 +7,36 @@ import TodoList from './components/TodoList/TodoList';
 import { Todo } from './types/Todo';
 import { saveTodos } from './utils/localStorage';
 import {
-  fetchTodos,
   postTodo,
   deleteTodo as apiDeleteTodo,
   putTodo,
   patchTodo,
 } from './api/todos';
-import { LimitType, Pagination } from './components/Pagination/Pagination';
+import { Pagination } from './components/Pagination/Pagination';
+import { useAppDispatch, useAppSelector } from './hooks/redux.hooks';
+import { fetchTodos } from './store/reducer/actionCreators';
+import { todosSlice } from './store/reducer/todosSlice';
 
 const AppContent: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { todos, count, page, limit } = useAppSelector(
+    (state) => state.todosSlice
+  );
+
   // const [todos, setTodos] = useState<Todo[]>(() => loadTodos());
-  const [count, setCount] = useState<number>(0); //Общее кол-во todos
-  const [todos, setTodos] = useState<Todo[]>([]);
+  // const [count, setCount] = useState<number>(0); //Общее кол-во todos
+  // const [todos, setTodos] = useState<Todo[]>([]);
   const [sortBy, setSortBy] = useState<'newest' | 'oldest'>('newest');
   const { darkMode, toggleTheme } = React.useContext(ThemeContext);
-  const [limit, setLimit] = useState<LimitType>('5');
-  const [page, setPage] = useState<number>(1);
+  // const [limit, setLimit] = useState<LimitType>('5');
+  // const [page, setPage] = useState<number>(1);
 
   const refresh = useCallback(async () => {
-    const { todos, totalCount } = await fetchTodos(page, Number(limit));
-    setTodos(todos);
-    setCount(totalCount);
-  }, [page, limit]);
+    const action = fetchTodos({ page, limit });
+    dispatch(action);
+  }, [dispatch, page, limit]);
+
+  // const { handleAddTodo, toggleComlete} = useAppContent();
 
   const addTodo = async (todo: Todo) => {
     await postTodo(todo.text);
@@ -57,7 +65,8 @@ const AppContent: React.FC = () => {
   useEffect(() => {}, [count]);
 
   useEffect(() => {
-    setPage(1);
+    dispatch(todosSlice.actions.setPage(1));
+    // setPage(1);
   }, [limit]);
 
   useEffect(() => {
@@ -87,14 +96,7 @@ const AppContent: React.FC = () => {
               sortBy={sortBy}
               setSortBy={setSortBy}
             />
-            <Pagination
-              count={count}
-              limit={limit}
-              setLimit={setLimit}
-              page={page}
-              setPage={setPage}
-              todos={todos}
-            />
+            <Pagination />
           </CardContent>
         </Card>
       </div>
