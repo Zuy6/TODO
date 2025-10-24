@@ -6,20 +6,23 @@ import AddTodo from './components/AddTodo/AddTodo';
 import TodoList from './components/TodoList/TodoList';
 import { Todo } from './types/Todo';
 import { saveTodos } from './utils/localStorage';
-import {
-  postTodo,
-  deleteTodo as apiDeleteTodo,
-  putTodo,
-  patchTodo,
-} from './api/todos';
 import { Pagination } from './components/Pagination/Pagination';
 import { useAppDispatch, useAppSelector } from './hooks/redux.hooks';
-import { fetchTodos } from './store/reducer/actionCreators';
+import {
+  fetchTodos,
+  patchTodo,
+  postTodo,
+  putTodo,
+  deleteTodo,
+} from './store/reducer/actionCreators';
 import { todosSlice } from './store/reducer/todosSlice';
+import { Spinner } from './components/ui/spinner';
+import { toast, Toaster } from 'sonner';
+import { todoApi } from './api/todos/todos';
 
 const AppContent: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { todos, count, page, limit } = useAppSelector(
+  const { todos, count, page, limit, isLoading, error } = useAppSelector(
     (state) => state.todosSlice
   );
 
@@ -32,29 +35,27 @@ const AppContent: React.FC = () => {
   // const [page, setPage] = useState<number>(1);
 
   const refresh = useCallback(async () => {
-    const action = fetchTodos({ page, limit });
-    dispatch(action);
+    dispatch(fetchTodos({ page, limit }));
   }, [dispatch, page, limit]);
 
   // const { handleAddTodo, toggleComlete} = useAppContent();
 
-  const addTodo = async (todo: Todo) => {
-    await postTodo(todo.text);
+  const addTodo = async ({ text }: Todo) => {
+    dispatch(postTodo({ text }));
+  };
+
+  const editTodo = async (id: number, text: string) => {
+    dispatch(putTodo({ text, id }));
     refresh();
   };
 
   const toggleComplete = async (id: number) => {
-    await patchTodo(id);
+    dispatch(patchTodo({ id }));
     refresh();
   };
 
-  const deleteTodo = async (id: number) => {
-    await apiDeleteTodo(id);
-    refresh();
-  };
-
-  const editTodo = async (id: number, text: string) => {
-    await putTodo(text, id);
+  const deleteTodos = async (id: number) => {
+    dispatch(deleteTodo({ id }));
     refresh();
   };
 
@@ -73,8 +74,15 @@ const AppContent: React.FC = () => {
     refresh();
   }, [refresh]);
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error);
+    }
+  }, [error]);
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      <Toaster closeButton position="top-center" />
       <div className="container mx-auto p-4">
         <Card className="max-w-2xl mx-auto">
           <CardHeader>
@@ -88,14 +96,18 @@ const AppContent: React.FC = () => {
           </CardHeader>
           <CardContent>
             <AddTodo addTodo={addTodo} />
-            <TodoList
-              todos={todos}
-              onToggle={toggleComplete}
-              onDelete={deleteTodo}
-              onEdit={editTodo}
-              sortBy={sortBy}
-              setSortBy={setSortBy}
-            />
+            {isLoading ? (
+              <Spinner />
+            ) : (
+              <TodoList
+                todos={todos}
+                onToggle={toggleComplete}
+                onDelete={deleteTodos}
+                onEdit={editTodo}
+                sortBy={sortBy}
+                setSortBy={setSortBy}
+              />
+            )}
             <Pagination />
           </CardContent>
         </Card>
