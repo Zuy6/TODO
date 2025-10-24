@@ -63,7 +63,7 @@ export const putTodo = createAsyncThunk<Todo, PutTodosRequest, RejectResponse>(
 );
 
 export const deleteTodo = createAsyncThunk<
-  Number,
+  number,
   DeleteTodosRequst,
   RejectResponse
 >('todos/deleteTodo', async ({ id }, thunkApi) => {
