@@ -5,9 +5,7 @@ import {
   FetchTodosResponse,
   PatchTodosRequest,
   PostTodosRequest,
-  PostTodosResponse,
   PutTodosRequest,
-  PutTodosResponse,
 } from './todos.types';
 import { Todo } from '@/types/Todo';
 

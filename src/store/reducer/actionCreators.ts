@@ -1,6 +1,5 @@
 import { todoApi } from '@/api/todos/todos';
-import { todosSlice, TodosState } from './todosSlice';
-import { AppDispatch } from '../store';
+import { TodosState } from './todosSlice';
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { Todo } from '@/types/Todo';
 import {
@@ -10,7 +9,6 @@ import {
   PostTodosRequest,
   PutTodosRequest,
 } from '@/api/todos/todos.types';
-import { AppleIcon } from 'lucide-react';
 
 type FetchTodosParams = Pick<TodosState, 'page' | 'limit'>;
 

@@ -1,8 +1,6 @@
-import { FetchTodosResponse } from '@/api/todos/todos';
 import { LimitType } from '@/components/Pagination/Pagination';
 import { Todo } from '@/types/Todo';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { error } from 'console';
 import {
   deleteTodo,
   fetchTodos,
@@ -10,7 +8,6 @@ import {
   postTodo,
   putTodo,
 } from './actionCreators';
-import { ActivityIcon } from 'lucide-react';
 
 export type TodosState = {
   todos: Todo[];

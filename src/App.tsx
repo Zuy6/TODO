@@ -18,7 +18,6 @@ import {
 import { todosSlice } from './store/reducer/todosSlice';
 import { Spinner } from './components/ui/spinner';
 import { toast, Toaster } from 'sonner';
-import { todoApi } from './api/todos/todos';
 
 const AppContent: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -42,6 +41,7 @@ const AppContent: React.FC = () => {
 
   const addTodo = async ({ text }: Todo) => {
     dispatch(postTodo({ text }));
+    refresh();
   };
 
   const editTodo = async (id: number, text: string) => {
@@ -68,7 +68,7 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     dispatch(todosSlice.actions.setPage(1));
     // setPage(1);
-  }, [limit]);
+  }, [dispatch]);
 
   useEffect(() => {
     refresh();
