@@ -7,7 +7,7 @@ import {
   patchTodo,
   postTodo,
   putTodo,
-} from './actionCreators';
+} from './actionCreatorsTodos';
 
 export type TodosState = {
   todos: Todo[];
@@ -41,8 +41,8 @@ export const todosSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchTodos.fulfilled, (state, action) => {
-        state.todos = action.payload.todos;
-        state.count = action.payload.totalCount;
+        state.todos = action.payload;
+        state.count = action.payload.length;
         state.isLoading = false;
         state.error = '';
       })
@@ -53,7 +53,8 @@ export const todosSlice = createSlice({
       .addCase(fetchTodos.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-      })
+      });
+    builder
       .addCase(postTodo.fulfilled, (state, action) => {
         const newTodo = action.payload;
         const { todos, limit } = state;
@@ -62,7 +63,8 @@ export const todosSlice = createSlice({
       })
       .addCase(postTodo.rejected, (state, action) => {
         state.error = action.payload;
-      })
+      });
+    builder
       .addCase(putTodo.fulfilled, (state, action) => {
         const updatedTodo = action.payload;
         state.todos = state.todos.map((todo) =>
@@ -71,7 +73,8 @@ export const todosSlice = createSlice({
       })
       .addCase(putTodo.rejected, (state, action) => {
         state.error = action.payload;
-      })
+      });
+    builder
       .addCase(patchTodo.fulfilled, (state, action) => {
         const toggleTodo = action.payload;
         state.todos = state.todos.map((todo) =>
@@ -80,11 +83,9 @@ export const todosSlice = createSlice({
       })
       .addCase(patchTodo.rejected, (state, action) => {
         state.error = action.payload;
-      })
-      .addCase(deleteTodo.fulfilled, (state, action) => {
-        const id = action.payload;
-        state.todos = state.todos.filter((todo) => todo.id !== id);
-      })
+      });
+    builder
+      .addCase(deleteTodo.fulfilled, () => {})
       .addCase(deleteTodo.rejected, (state, action) => {
         state.error = action.payload;
       });

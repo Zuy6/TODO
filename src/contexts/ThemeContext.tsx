@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, PropsWithChildren, FC } from 'react';
 import { saveTheme, loadTheme } from '../utils/localStorage';
 
 interface ThemeContextType {
@@ -11,9 +11,7 @@ export const ThemeContext = createContext<ThemeContextType>({
   toggleTheme: () => {},
 });
 
-export const ThemeProvider: React.FC<{ children: ReactNode }> = ({
-  children,
-}) => {
+export const ThemeProvider: FC<PropsWithChildren> = ({ children }) => {
   const [darkMode, setDarkMode] = useState<boolean>(loadTheme() === 'dark');
 
   useEffect(() => {

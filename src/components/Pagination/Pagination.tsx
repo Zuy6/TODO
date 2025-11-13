@@ -8,7 +8,7 @@ import {
   SelectValue,
 } from '../ui/select';
 import { useAppDispatch, useAppSelector } from '@/hooks/redux.hooks';
-import { todosSlice } from '@/store/reducer/todosSlice';
+import { todosSlice } from '@/store/Todos/todosSlice';
 import { Todo } from '@/types/Todo';
 
 export type LimitType = '5' | '10' | '20';
